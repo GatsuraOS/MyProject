@@ -6,6 +6,6 @@ chislo2 = float(chislo2.replace(",", "."))
 chislo3 = float(chislo3.replace(",", "."))
 
 
-pozitive = (str(chislo1 > 0) + str(chislo2 > 0) + str(chislo3 > 0)).count("True")
-negotive = (str(chislo1 > 0) + str(chislo2 > 0) + str(chislo3 > 0)).count("False")
+pozitive = (chislo1 > 0) + (chislo2 > 0) + (chislo3 > 0)
+negotive = (chislo1 < 0) + (chislo2 < 0) + (chislo3 < 0)
 print(f"В введенных вами числах {pozitive} больше нуля и {negotive} меньше нуля.")
