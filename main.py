@@ -1,3 +1,4 @@
-N = int(input("N="))
-my_lst: int = [2**i for i in range(1, N + 1)]
-print(my_lst)
+text: str = input("Введите текст: ")
+dictinary = {i: text.count(i) for i in text}
+
+print(dictinary)
