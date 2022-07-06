@@ -1,10 +1,13 @@
 # import sys
+import os
+#import readchar
 
 list_a = ["hello", "world", "!!!"]
 i = 0
 simb = "s"
 print(list_a[i])
 while simb != "`":
+    #simb = readchar.readchar()
     simb = input()
     if simb == ">":
         i += 1
@@ -17,4 +20,5 @@ while simb != "`":
     # else:
     #     if simb == "`":
     #         break
+    os.system('cls')
     print(list_a[i])
