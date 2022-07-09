@@ -6,9 +6,9 @@ def building_matrix(n):
     for i in range(n):
         matrix: list = []
         for j in range(n):
-            if i == j:
+            if i + j == n - 1:
                 matrix.append(3)
-            elif i + 1 == j:
+            elif i + j == n - 2:
                 matrix.append(2)
             else:
                 matrix.append(1)
