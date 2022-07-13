@@ -9,7 +9,7 @@ with open ("input.txt", "r", encoding="utf-8") as file:
 
 
 if len(lines) < n:
-    lines *= math.ceil(n // len(lines))
+    lines *= math.ceil(n / len(lines))
 
 
 for i in range(n):
