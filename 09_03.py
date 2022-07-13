@@ -1,6 +1,7 @@
 
 N = int(input("N "))
 
+
 def building_matrix(n):
     matrix2 = []
     for i in range(n):
@@ -19,4 +20,3 @@ def building_matrix(n):
 my_matrix = building_matrix(N)
 for i in range(N):
     print(my_matrix[i])
-
