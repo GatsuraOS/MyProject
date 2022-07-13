@@ -1,6 +1,3 @@
-import itertools
-
-
 n = int(input("N: "))
 
 
