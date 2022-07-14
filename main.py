@@ -71,34 +71,47 @@ class OrderItems(BaseModel):
 
 
 data = {
-    "id": "1354897",
+    "id": 1354897,
     "order_id": {
-        "id": "123548798",
+        "id": 123548798,
         "bot_user_id": {
-            "id": "123",
+            "id": 123,
             "is_blocked": False,
             "language_id": {
                 "id": "eng",
-                "language_code": "1"
+                "language_code": 1
             },
         },
         "data_create": datetime.now(),
         "status_id": {
-            "id": "2",
+            "id": 2,
             "name": "act"
         },
         "invoice_id": {
-            "data_create": datetime.now().timestamp
+            "id": 123123,
+            "bot_user_id": {
+                "id": 123,
+                "is_blocked": False,
+                "language_id": {
+                    "id": "eng",
+                    "language_code": 1
+                },
+            },
+            "data_create": datetime.now().timestamp,
+            "status_id": {
+                "id": 2,
+                "name": "act"
+            },
         },
     },
     "product_id": {
-        "id": "1234567",
+        "id": 1234567,
         "category_id": {
-            "id": "1222855",
+            "id": 1222855,
             "is_published": True,
             "name": "products"
         },
-        "price": "2",
+        "price": 2,
         "is_published": True,
         "name": "milk"
     },
