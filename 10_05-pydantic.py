@@ -3,7 +3,7 @@ import datetime
 
 
 class Categories(BaseModel):
-    id: int = Field(min_length=2)
+    id: str = Field(min_length=2)
     parent_id: int | None
     is_published: bool
     name: str
@@ -11,7 +11,7 @@ class Categories(BaseModel):
 
 
 class Products(BaseModel):
-    id: int = Field(min_length=7)
+    id: str = Field(min_length=7)
     category_id: list[Categories]
     price: int
     media: str | None
@@ -22,7 +22,7 @@ class Products(BaseModel):
 
 
 class Language(BaseModel):
-    id: str= Field(max_length=3)
+    id: str = Field(max_length=3)
     language_code: int
 
 
@@ -47,7 +47,7 @@ class Invoices(BaseModel):
 
 
 class Orders(BaseModel):
-    id: int
+    id: str
     bot_user_id: list[BotUsers]
     data_create: int
     status_id: list[Status]
@@ -55,7 +55,7 @@ class Orders(BaseModel):
 
 
 class OrderItems(BaseModel):
-    id: int
+    id: str
     order_id: list[Orders]
     product_id: list[Products]
     total: int | None
@@ -71,11 +71,11 @@ class OrderItems(BaseModel):
 
 
 data = {
-    "id": 1354897,
+    "id": "1354897",
     "order_id": {
-        "id": 123548798,
+        "id": "123548798",
         "bot_user_id": {
-            "id": 123,
+            "id": "123",
             "is_blocked": False,
             "language_id": {
                 "id": "eng",
@@ -84,13 +84,13 @@ data = {
         },
         "data_create": datetime.now(),
         "status_id": {
-            "id": 2,
+            "id": "2",
             "name": "act"
         },
         "invoice_id": {
-            "id": 123123,
+            "id": "123123",
             "bot_user_id": {
-                "id": 123,
+                "id": "123",
                 "is_blocked": False,
                 "language_id": {
                     "id": "eng",
@@ -99,15 +99,15 @@ data = {
             },
             "data_create": datetime.now().timestamp,
             "status_id": {
-                "id": 2,
+                "id": "2",
                 "name": "act"
             },
         },
     },
     "product_id": {
-        "id": 1234567,
+        "id": "1234567",
         "category_id": {
-            "id": 1222855,
+            "id": "1222855",
             "is_published": True,
             "name": "products"
         },
