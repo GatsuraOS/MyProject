@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, validator
-import datetime
+from datetime import datetime
 
 
 class Categories(BaseModel):
@@ -113,8 +113,9 @@ data = {
         },
         "price": 2,
         "is_published": True,
-        "name": "milk"
+        "name": "milk",
     },
+    "total": None
 }
 
 
