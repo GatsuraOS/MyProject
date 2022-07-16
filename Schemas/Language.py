@@ -2,10 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class LanguageSchema(BaseModel):
-    language_code: int = Field(
-        default="eng",
-        max_length=10
-    )
+    language_code: str = Field(max_length=10)
 
 
 class LanguageInDBSchema(LanguageSchema):

@@ -5,7 +5,6 @@ from . import CategoryInDBSchema
 class ProductSchema(BaseModel):
     category_id: list[CategoryInDBSchema]
     price: int = Field(default=None)
-    media: str = Field(default=None)
     total: int = Field(default=None)
     is_published: bool = Field(default=False)
     name: str = Field(max_length=20)

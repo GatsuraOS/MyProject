@@ -6,7 +6,7 @@ from . import InvoiceInDBSchema
 
 class OrderSchema(BaseModel):
     bot_user_id: list[BotUserInDBSchema]
-    data_create: int | float
+    date_create: int | float
     status_id: list[StatusInDBSchema]
     invoice_id: list[InvoiceInDBSchema]
 
