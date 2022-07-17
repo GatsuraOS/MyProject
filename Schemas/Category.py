@@ -8,7 +8,6 @@ class CategorySchema(BaseModel):
     )
     is_published: bool
     name: str = Field(max_length=20)
-    name_en: str = Field(default=None)
 
 
 class CategoryInDBSchema(CategorySchema):

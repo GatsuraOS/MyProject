@@ -8,7 +8,6 @@ class ProductSchema(BaseModel):
     total: int = Field(default=None)
     is_published: bool = Field(default=False)
     name: str = Field(max_length=20)
-    name_en: str = Field(default=None)
 
 
 class ProductInDBSchema(ProductSchema):
