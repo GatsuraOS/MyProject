@@ -9,12 +9,11 @@ cur = conn.cursor()
 
 class LanguageCRUD:
 
-
     @staticmethod
-    def add(language:LanguageSchema) -> None:
+    def add(language: LanguageSchema) -> None:
         cur.execute("""
         INSERT INTO languages(language_cod);
-        """, (language.language_code))
+        """, (language.language_code, ))
         conn.commit()
 
     @staticmethod
@@ -48,4 +47,14 @@ class LanguageCRUD:
         return languages
 
     @staticmethod
-    def update(language_id: int, language: LanguageInDBSchema) -> None:
+    def update(language_id: int, language: LanguageSchema) -> None:
+        cur.execute("""
+        UPDATE languages SET (language_cod) WHERE id = ?;
+        """, (language.language_code, language_id))
+        conn.commit()
+
+    @staticmethod
+    def delete(language_id: int) -> None:
+        cur.execute("""
+        DELETE FROM languages WHERE id = ?;
+        """, (language_id, ))
