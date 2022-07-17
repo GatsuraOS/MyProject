@@ -16,7 +16,6 @@ class CategoryCRUD:
         """, (category.parent_id, category.is_published, category.name))
         conn.commit()
 
-
     @staticmethod
     def get(category_id: int) -> list[CategoryInDBSchema]:
         cur.execute("""
@@ -33,7 +32,6 @@ class CategoryCRUD:
                 )
             )
         return categories
-
 
     @staticmethod
     def get_all() -> list[CategoryInDBSchema]:
@@ -52,14 +50,12 @@ class CategoryCRUD:
             )
         return categories
 
-
     @staticmethod
     def update(category_id: int, category: CategorySchema) -> None:
         cur.execute("""
         UPDATE categories SET (parent_id, is_published, name) WHERE id = ?;
         """, (category.parent_id, category.is_published, category.name, category_id))
         conn.commit()
-
 
     @staticmethod
     def delete(category_id: int) -> None:

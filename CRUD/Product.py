@@ -16,7 +16,6 @@ class ProductCRUD:
         """, (product.category_id, product.price, product.total, product.name))
         conn.commit()
 
-
     @staticmethod
     def get(product_id: int) -> list[ProductInDBSchema]:
         cur.execute("""
@@ -34,7 +33,6 @@ class ProductCRUD:
                 )
             )
         return products
-
 
     @staticmethod
     def get_all() -> list[ProductInDBSchema]:
@@ -54,7 +52,6 @@ class ProductCRUD:
             )
         return products
 
-
     @staticmethod
     def update(product_id: int, product: ProductSchema) -> None:
         cur.execute("""
@@ -62,10 +59,9 @@ class ProductCRUD:
         """, (product.category_id, product.price, product.total, product.name, product_id))
         conn.commit()
 
-
     @staticmethod
-    def delete(category_id: int) -> None:
+    def delete(product_id: int) -> None:
         cur.execute("""
-        DELETE FROM categories WHERE id = ?;
-        """, (category_id, ))
+        DELETE FROM products WHERE id = ?;
+        """, (product_id, ))
         conn.commit()
