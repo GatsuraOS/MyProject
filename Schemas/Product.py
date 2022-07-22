@@ -4,10 +4,10 @@ from . import CategoryInDBSchema
 
 class ProductSchema(BaseModel):
     category_id: list[CategoryInDBSchema]
-    price: int = Field(default=None)
-    total: int = Field(default=None)
+    price: int = Field(default=0)
+    total: int = Field(default=0)
     is_published: bool = Field(default=False)
-    name: str = Field(max_length=20)
+    name: str = Field(max_length=24)
 
 
 class ProductInDBSchema(ProductSchema):
