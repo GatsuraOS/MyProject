@@ -12,7 +12,7 @@ class CRUDCategory:
     @create_session
     def add(category: CategorySchema, session: Session = None) -> CategoryInDBSchema | None:
         category = Category(
-            **category.dict()
+            **category.__dict__
         )
         session.add(category)
         try:
@@ -35,7 +35,7 @@ class CRUDCategory:
 
     @staticmethod
     @create_session
-    def get(session: Session = None) -> list[Category]:
+    def get_all(session: Session = None) -> list[Category]:
         categories = session.execute(
             select(Category)
         )

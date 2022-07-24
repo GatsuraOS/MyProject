@@ -1,67 +1,52 @@
-import sqlite3
+from sqlalchemy import update, delete, select
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
+from Models import Product, create_session
 from Schemas import ProductSchema
 from Schemas import ProductInDBSchema
 
 
-conn = sqlite3.connect("db.db")
-cur = conn.cursor()
-
-
-class ProductCRUD:
+class CRUDProduct:
 
     @staticmethod
-    def add(product: ProductSchema) -> None:
-        cur.execute("""
-        INSERT INTO products(category_id, price, total, name);
-        """, (product.category_id, product.price, product.total, product.name))
-        conn.commit()
+    @create_session
+    def add(product: ProductSchema, session: Session = None) -> ProductInDBSchema | None:
+        product = Product(
+            **product.__dict__
+        )
+        session.add(product)
+        try:
+            session.commit()
+        except IntegrityError:
+            return None
+        else:
+            session.refresh(product)
+            return ProductInDBSchema(**product.__dict__)
 
     @staticmethod
-    def get(product_id: int) -> list[ProductInDBSchema]:
-        cur.execute("""
-        SELECT * FROM products WHERE id = ?;
-        """, (product_id, ))
-        products = []
-        for product in cur.fetchall():
-            products.append(
-                ProductInDBSchema(
-                    id=product[0],
-                    category_id=product[1],
-                    price=product[2],
-                    total=product[3],
-                    name=product[4]
-                )
-            )
-        return products
+    @create_session
+    def get(product_id: int, session: Session = None) -> Product | None:
+        product = session.execute(
+            select(Product).where(Product.id == product_id)
+        )
+        product = product.first()
+        if product:
+            return product[0]
 
     @staticmethod
-    def get_all() -> list[ProductInDBSchema]:
-        cur.execute("""
-        SELECT * FROM products;
-        """)
-        products = []
-        for product in cur.fetchall():
-            products.append(
-                ProductInDBSchema(
-                    id=product[0],
-                    category_id=product[1],
-                    price=product[2],
-                    total=product[3],
-                    name=product[4]
-                )
-            )
-        return products
+    @create_session
+    def get_all(session: Session = None) -> list[Product]:
+        products = session.execute(
+            select(Product)
+        )
+        return [product[0] for product in products.all()]
 
     @staticmethod
-    def update(product_id: int, product: ProductSchema) -> None:
-        cur.execute("""
-        UPDATE products SET (category_id, price, total, name) WHERE id = ?;
-        """, (product.category_id, product.price, product.total, product.name, product_id))
-        conn.commit()
+    @create_session
+    def delete(product_id: int, session: Session = None) -> None:
+        session.execute(
+            delete(Product).where(Product.id == product_id)
+        )
+        session.commit()
 
-    @staticmethod
-    def delete(product_id: int) -> None:
-        cur.execute("""
-        DELETE FROM products WHERE id = ?;
-        """, (product_id, ))
-        conn.commit()
