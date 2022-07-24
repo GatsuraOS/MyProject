@@ -1,65 +1,60 @@
-import sqlite3
-from Schemas import OrderItemSchema
-from Schemas import OrderItemInDBSchema
+from sqlalchemy import delete, update, select
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
+from Models import OrderItem, create_session
+from Schemas import OrderItemSchema, OrderItemInDBSchema
 
 
-conn = sqlite3.connect("db.db")
-cur = conn.cursor()
-
-
-class OrderItemCRUD:
-
-    @staticmethod
-    def add(order_item: OrderItemSchema) -> None:
-        cur.execute("""
-        INSERT INTO order_items(order_id, product_id, total);
-        """, (order_item.order_id, order_item.product_id, order_item.total))
-        conn.commit()
+class CRUDOrderItem:
 
     @staticmethod
-    def get(order_item_id: int) -> list[OrderItemInDBSchema]:
-        cur.execute("""
-        SELECT * FROM order_items WHERE id = ?;
-        """, (order_item_id, ))
-        order_items = []
-        for order_item in cur.fetchall():
-            order_items.append(
-                OrderItemInDBSchema(
-                    id=order_item[0],
-                    order_id=order_item[1],
-                    product_id=order_item[2],
-                    total=order_item[3]
-                )
+    @create_session
+    def add(order_item: OrderItemSchema, session: Session = None) -> OrderItemInDBSchema | None:
+        order_item = OrderItem(
+            **order_item.__dict__
+        )
+        session.add(order_item)
+        try:
+            session.commit()
+        except IntegrityError:
+            return None
+        else:
+            session.refresh(order_item)
+            return OrderItemInDBSchema(**order_item.__dict__)
+
+    @staticmethod
+    @create_session
+    def get(order_item_id: int, session: Session = None) -> OrderItem | None:
+        order_item = session.execute(
+            select(OrderItem).where(OrderItem.id == order_item_id)
+        )
+        order_item = order_item.first()
+        if order_item:
+            return order_item[0]
+
+    @staticmethod
+    @create_session
+    def get_all(session: Session = None) -> list[OrderItem]:
+        order_items = session.execute(
+            select(OrderItem)
+        )
+        return [order_item[0] for order_item in order_items.all()]
+
+    @staticmethod
+    @create_session
+    def delete(order_item_id: int, session: Session = None) -> None:
+        session.execute(
+            delete(OrderItem).where(OrderItem.id == order_item_id)
+        )
+        session.commit()
+
+    @staticmethod
+    @create_session
+    def update(order_item: OrderItemInDBSchema, session: Session = None) -> None:
+        session.execute(
+            update(OrderItem).where(OrderItem.id == order_item.id).values(
+                **order_item.__dict__
             )
-        return order_items
-
-    @staticmethod
-    def get_all() -> list[OrderItemInDBSchema]:
-        cur.execute("""
-        SELECT * FROM order_items;
-        """)
-        order_items = []
-        for order_item in cur.fetchall():
-            order_items.append(
-                OrderItemInDBSchema(
-                    id=order_item[0],
-                    order_id=order_item[1],
-                    product_id=order_item[2],
-                    total=order_item[3]
-                )
-            )
-        return order_items
-
-    @staticmethod
-    def update(order_item_id: int, order_item: OrderItemSchema) -> None:
-        cur.execute("""
-        UPDATE order_items SET (order_id, product_id, total) WHERE id = ?;
-        """, (order_item.order_id, order_item.product_id, order_item.total, order_item_id))
-        conn.commit()
-
-    @staticmethod
-    def delete(order_item_id: int) -> None:
-        cur.execute("""
-        DELETE FROM order_items WHERE id = ?;
-        """, (order_item_id, ))
-        conn.commit()
+        )
+        session.commit()
