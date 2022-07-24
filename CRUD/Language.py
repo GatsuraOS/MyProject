@@ -53,7 +53,7 @@ class CRUDLanguage:
     @create_session
     def update(language: LanguageInDBSchema, session: Session = None) -> None:
         session.execute(
-            update(Language).where(Language.id == language.id).value(
+            update(Language).where(Language.id == language.id).values(
                 **language.__dict__
             )
         )
