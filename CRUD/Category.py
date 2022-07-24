@@ -1,65 +1,60 @@
-import sqlite3
-from Schemas import CategorySchema
-from Schemas import CategoryInDBSchema
+from sqlalchemy import select, update, delete
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
+from Models import Category, create_session
+from Schemas import CategorySchema, CategoryInDBSchema
 
 
-conn = sqlite3.connect("db.db")
-cur = conn.cursor()
-
-
-class CategoryCRUD:
-
-    @staticmethod
-    def add(category: CategorySchema) -> None:
-        cur.execute("""
-        INSERT INTO categories(parent_id, is_published, name);
-        """, (category.parent_id, category.is_published, category.name))
-        conn.commit()
+class CRUDCategory:
 
     @staticmethod
-    def get(category_id: int) -> list[CategoryInDBSchema]:
-        cur.execute("""
-        SELECT * FROM categories WHERE id = ?;
-        """, (category_id, ))
-        categories = []
-        for category in cur.fetchall():
-            categories.append(
-                CategoryInDBSchema(
-                    id=category[0],
-                    parent_id=category[1],
-                    is_published=category[2],
-                    name=category[3]
-                )
+    @create_session
+    def add(category: CategorySchema, session: Session = None) -> CategoryInDBSchema | None:
+        category = Category(
+            **category.dict()
+        )
+        session.add(category)
+        try:
+            session.commit()
+        except IntegrityError:
+            return None
+        else:
+            session.refresh(category)
+            return CategoryInDBSchema(**category.__dict__)
+
+    @staticmethod
+    @create_session
+    def get(category_id: int, session: Session = None) -> Category | None:
+        category = session.execute(
+            select(Category).where(Category.id == category_id)
+        )
+        category = category.first()
+        if category:
+            return category[0]
+
+    @staticmethod
+    @create_session
+    def get(session: Session = None) -> list[Category]:
+        categories = session.execute(
+            select(Category)
+        )
+        return [category[0] for category in categories.all()]
+
+    @staticmethod
+    @create_session
+    def delete(category_id: int, session: Session = None) -> None:
+        session.execute(
+            delete(Category).where(Category.id == category_id)
+        )
+        session.commit()
+
+    @staticmethod
+    @create_session
+    def update(category: CategoryInDBSchema, session: Session = None) -> None:
+        session.execute(
+            update(Category).where(Category.id == category.id).values(
+                **category.__dict__
             )
-        return categories
-
-    @staticmethod
-    def get_all() -> list[CategoryInDBSchema]:
-        cur.execute("""
-        SELECT * FROM categories;
-        """)
-        categories = []
-        for category in cur.fetchall():
-            categories.append(
-                CategoryInDBSchema(
-                    id=category[0],
-                    parent_id=category[1],
-                    is_published=category[2],
-                    name=category[3]
-                )
-            )
-        return categories
-
-    @staticmethod
-    def update(category_id: int, category: CategorySchema) -> None:
-        cur.execute("""
-        UPDATE categories SET (parent_id, is_published, name) WHERE id = ?;
-        """, (category.parent_id, category.is_published, category.name, category_id))
-        conn.commit()
-
-    @staticmethod
-    def delete(category_id: int) -> None:
-        cur.execute("""
-        DELETE FROM categories WHERE id = ?;
-        """, (category_id, ))
-        conn.commit()
+        )
+        session.commit()
