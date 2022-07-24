@@ -1,60 +1,60 @@
-import sqlite3
-from Schemas import LanguageSchema
-from Schemas import LanguageInDBSchema
+from sqlalchemy import update, delete, select
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
+from Schemas import LanguageSchema, LanguageInDBSchema
+from Models import Language, create_session
 
 
-conn = sqlite3.connect("db.db")
-cur = conn.cursor()
-
-
-class LanguageCRUD:
-
-    @staticmethod
-    def add(language: LanguageSchema) -> None:
-        cur.execute("""
-        INSERT INTO languages(language_cod);
-        """, (language.language_code, ))
-        conn.commit()
+class CRUDLanguage:
 
     @staticmethod
-    def get(language_id: int) -> list[LanguageInDBSchema]:
-        cur.execute("""
-        SELECT * FROM languages WHERE ID =?;
-        """, (language_id, ))
-        languages = []
-        for language in cur.fetchall():
-            languages.append(
-                LanguageInDBSchema(
-                    id=language[0],
-                    language_cod=language[1]
-                )
+    @create_session
+    def add(language: LanguageSchema, session: Session = None) -> LanguageInDBSchema | None:
+        language = Language(
+            **language.__dict__
+        )
+        session.add(language)
+        try:
+            session.commit()
+        except IntegrityError:
+            return None
+        else:
+            session.refresh(language)
+            return LanguageInDBSchema(**language.__dict__)
+
+    @staticmethod
+    @create_session
+    def get(language_id: int, session: Session = None) -> Language | None:
+        language = session.execute(
+            select(Language).where(Language.id == language_id)
+        )
+        language = language.first()
+        if language:
+            return language[0]
+
+    @staticmethod
+    @create_session
+    def get_all(session: Session = None) -> list[Language]:
+        languages = session.execute(
+            select(Language)
+        )
+        return [language[0] for language in languages.all()]
+
+    @staticmethod
+    @create_session
+    def delete(language_id: int, session: Session = None) -> None:
+        session.execute(
+            delete(Language).where(Language.id == language_id)
+        )
+        session.commit()
+
+    @staticmethod
+    @create_session
+    def update(language: LanguageInDBSchema, session: Session = None) -> None:
+        session.execute(
+            update(Language).where(Language.id == language.id).value(
+                **language.__dict__
             )
-        return languages
-
-    @staticmethod
-    def get_all() -> list[LanguageInDBSchema]:
-        cur.execute("""
-        SELECT * FROM languages;
-        """)
-        languages = []
-        for language in cur.fetchall():
-            languages.append(
-                LanguageInDBSchema(
-                    id=language[0],
-                    language_cod=language[1]
-                )
-            )
-        return languages
-
-    @staticmethod
-    def update(language_id: int, language: LanguageSchema) -> None:
-        cur.execute("""
-        UPDATE languages SET (language_cod) WHERE id = ?;
-        """, (language.language_code, language_id))
-        conn.commit()
-
-    @staticmethod
-    def delete(language_id: int) -> None:
-        cur.execute("""
-        DELETE FROM languages WHERE id = ?;
-        """, (language_id, ))
+        )
+        session.commit()
