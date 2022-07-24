@@ -50,3 +50,12 @@ class CRUDProduct:
         )
         session.commit()
 
+    @staticmethod
+    @create_session
+    def update(product: ProductInDBSchema, session: Session = None) -> None:
+        session.execute(
+            update(Product).where(Product.id == product.id).values(
+                **product.__dict__
+            )
+        )
+        session.commit()
