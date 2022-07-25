@@ -12,7 +12,7 @@ class CRUDCategory:
     @create_session
     def add(category: CategorySchema, session: Session = None) -> CategoryInDBSchema | None:
         category = Category(
-            **category.__dict__
+            **category.dict()
         )
         session.add(category)
         try:
@@ -25,21 +25,21 @@ class CRUDCategory:
 
     @staticmethod
     @create_session
-    def get(category_id: int, session: Session = None) -> Category | None:
+    def get(category_id: int, session: Session = None) -> CategoryInDBSchema | None:
         category = session.execute(
             select(Category).where(Category.id == category_id)
         )
         category = category.first()
         if category:
-            return category[0]
+            return CategoryInDBSchema(**category[0].__dict__)
 
     @staticmethod
     @create_session
-    def get_all(session: Session = None) -> list[Category]:
+    def get_all(session: Session = None) -> list[CategoryInDBSchema]:
         categories = session.execute(
             select(Category)
         )
-        return [category[0] for category in categories.all()]
+        return [CategoryInDBSchema(**category[0].__dict__) for category in categories.all()]
 
     @staticmethod
     @create_session
@@ -54,7 +54,7 @@ class CRUDCategory:
     def update(category: CategoryInDBSchema, session: Session = None) -> None:
         session.execute(
             update(Category).where(Category.id == category.id).values(
-                **category.__dict__
+                **category.dict()
             )
         )
         session.commit()

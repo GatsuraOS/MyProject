@@ -12,7 +12,7 @@ class CRUDOrders:
     @create_session
     def add(order: OrderSchema, session: Session = None) -> OrderInDBSchema | None:
         order = Order(
-            **order.__dict__
+            **order.dict()
         )
         session.add(order)
         try:
@@ -25,21 +25,21 @@ class CRUDOrders:
 
     @staticmethod
     @create_session
-    def get(order_id: int, session: Session = None) -> Order | None:
+    def get(order_id: int, session: Session = None) -> OrderInDBSchema | None:
         order = session.execute(
             select(Order).where(Order.id == order_id)
         )
         order = order.first()
         if order:
-            return order[0]
+            return OrderInDBSchema(**order[0].__dict__)
 
     @staticmethod
     @create_session
-    def get_all(session: Session = None) -> list[Order]:
+    def get_all(session: Session = None) -> list[OrderInDBSchema]:
         orders = session.execute(
             select(Order)
         )
-        return [order[0] for order in orders.all()]
+        return [OrderInDBSchema(**order[0].__dict__) for order in orders.all()]
 
     @staticmethod
     @create_session
@@ -54,7 +54,7 @@ class CRUDOrders:
     def update(order: OrderInDBSchema, session: Session = None) -> None:
         session.execute(
             update(Order).where(Order.id == order.id).values(
-                **order.__dict__
+                **order.dict()
             )
         )
         session.commit()

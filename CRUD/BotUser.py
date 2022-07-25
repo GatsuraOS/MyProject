@@ -12,7 +12,7 @@ class CRUDBotUser:
     @create_session
     def add(bot_user: BotUserSchema, session: Session = None) -> BotUserInDBSchema | None:
         bot_user = BotUser(
-            **bot_user.__dict__
+            **bot_user.dict()
         )
         session.add(bot_user)
         try:
@@ -25,21 +25,21 @@ class CRUDBotUser:
 
     @staticmethod
     @create_session
-    def get(bot_user_id: str, session: Session = None) -> BotUser | None:
+    def get(bot_user_id: str, session: Session = None) -> BotUserInDBSchema | None:
         bot_user = session.execute(
             select(BotUser).where(BotUser.id == bot_user_id)
         )
         bot_user = bot_user.first()
         if bot_user:
-            return bot_user[0]
+            return BotUserInDBSchema(**bot_user[0].__dict__)
 
     @staticmethod
     @create_session
-    def get_all(session: Session = None) -> list[BotUser]:
+    def get_all(session: Session = None) -> list[BotUserInDBSchema]:
         bot_users = session.execute(
             select(BotUser)
         )
-        return [bot_user[0] for bot_user in bot_users.all()]
+        return [BotUserInDBSchema(**bot_user[0].__dict__) for bot_user in bot_users.all()]
 
     @staticmethod
     @create_session
@@ -54,7 +54,7 @@ class CRUDBotUser:
     def update(bot_user: BotUserInDBSchema, session: Session = None) -> None:
         session.execute(
             update(BotUser).where(BotUser.id == bot_user.id).values(
-                **bot_user.__dict__
+                **bot_user.dict()
             )
         )
         session.commit()

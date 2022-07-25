@@ -12,7 +12,7 @@ class CRUDInvoice:
     @create_session
     def add(invoice: InvoiceSchema, session: Session) -> InvoiceInDBSchema | None:
         invoice = Invoice(
-            **invoice.__dict__
+            **invoice.dict()
         )
         session.add(invoice)
         try:
@@ -25,21 +25,21 @@ class CRUDInvoice:
 
     @staticmethod
     @create_session
-    def get(invoice_id: str, session: Session = None) -> Invoice | None:
+    def get(invoice_id: str, session: Session = None) -> InvoiceInDBSchema | None:
         invoice = session.execute(
             select(Invoice).where(Invoice.id == invoice_id)
         )
         invoice = invoice.first()
         if invoice:
-            return invoice[0]
+            return InvoiceInDBSchema(**invoice[0].__dict__)
 
     @staticmethod
     @create_session
-    def get_all(session: Session = None) -> list[Invoice]:
+    def get_all(session: Session = None) -> list[InvoiceInDBSchema]:
         invoices = session.execute(
             select(Invoice)
         )
-        return [invoice[0] for invoice in invoices.all()]
+        return [InvoiceInDBSchema(**invoice[0].__dict__) for invoice in invoices.all()]
 
     @staticmethod
     @create_session
@@ -54,7 +54,7 @@ class CRUDInvoice:
     def update(invoice: InvoiceInDBSchema, session: Session = None) -> None:
         session.execute(
             update(Invoice).where(Invoice.id == invoice.id).values(
-                **invoice.__dict__
+                **invoice.dict()
             )
         )
         session.commit()

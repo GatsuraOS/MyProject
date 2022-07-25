@@ -12,7 +12,7 @@ class CRUDLanguage:
     @create_session
     def add(language: LanguageSchema, session: Session = None) -> LanguageInDBSchema | None:
         language = Language(
-            **language.__dict__
+            **language.dict()
         )
         session.add(language)
         try:
@@ -25,21 +25,21 @@ class CRUDLanguage:
 
     @staticmethod
     @create_session
-    def get(language_id: int, session: Session = None) -> Language | None:
+    def get(language_id: int, session: Session = None) -> LanguageInDBSchema | None:
         language = session.execute(
             select(Language).where(Language.id == language_id)
         )
         language = language.first()
         if language:
-            return language[0]
+            return LanguageInDBSchema(**language[0].__dict__)
 
     @staticmethod
     @create_session
-    def get_all(session: Session = None) -> list[Language]:
+    def get_all(session: Session = None) -> list[LanguageInDBSchema]:
         languages = session.execute(
             select(Language)
         )
-        return [language[0] for language in languages.all()]
+        return [LanguageInDBSchema(**language[0].__dict__) for language in languages.all()]
 
     @staticmethod
     @create_session
@@ -54,7 +54,7 @@ class CRUDLanguage:
     def update(language: LanguageInDBSchema, session: Session = None) -> None:
         session.execute(
             update(Language).where(Language.id == language.id).values(
-                **language.__dict__
+                **language.dict()
             )
         )
         session.commit()

@@ -12,7 +12,7 @@ class CRUDOrderItem:
     @create_session
     def add(order_item: OrderItemSchema, session: Session = None) -> OrderItemInDBSchema | None:
         order_item = OrderItem(
-            **order_item.__dict__
+            **order_item.dict()
         )
         session.add(order_item)
         try:
@@ -25,21 +25,21 @@ class CRUDOrderItem:
 
     @staticmethod
     @create_session
-    def get(order_item_id: int, session: Session = None) -> OrderItem | None:
+    def get(order_item_id: int, session: Session = None) -> OrderItemInDBSchema | None:
         order_item = session.execute(
             select(OrderItem).where(OrderItem.id == order_item_id)
         )
         order_item = order_item.first()
         if order_item:
-            return order_item[0]
+            return OrderItemInDBSchema(**order_item[0].__dict__)
 
     @staticmethod
     @create_session
-    def get_all(session: Session = None) -> list[OrderItem]:
+    def get_all(session: Session = None) -> list[OrderItemInDBSchema]:
         order_items = session.execute(
             select(OrderItem)
         )
-        return [order_item[0] for order_item in order_items.all()]
+        return [OrderItemInDBSchema(**order_item[0].__dict__) for order_item in order_items.all()]
 
     @staticmethod
     @create_session
@@ -54,7 +54,7 @@ class CRUDOrderItem:
     def update(order_item: OrderItemInDBSchema, session: Session = None) -> None:
         session.execute(
             update(OrderItem).where(OrderItem.id == order_item.id).values(
-                **order_item.__dict__
+                **order_item.dict()
             )
         )
         session.commit()

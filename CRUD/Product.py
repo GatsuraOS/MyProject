@@ -13,7 +13,7 @@ class CRUDProduct:
     @create_session
     def add(product: ProductSchema, session: Session = None) -> ProductInDBSchema | None:
         product = Product(
-            **product.__dict__
+            **product.dict()
         )
         session.add(product)
         try:
@@ -26,21 +26,21 @@ class CRUDProduct:
 
     @staticmethod
     @create_session
-    def get(product_id: int, session: Session = None) -> Product | None:
+    def get(product_id: int, session: Session = None) -> ProductInDBSchema | None:
         product = session.execute(
             select(Product).where(Product.id == product_id)
         )
         product = product.first()
         if product:
-            return product[0]
+            return ProductInDBSchema(**product[0].__dict__)
 
     @staticmethod
     @create_session
-    def get_all(session: Session = None) -> list[Product]:
+    def get_all(session: Session = None) -> list[ProductInDBSchema]:
         products = session.execute(
             select(Product)
         )
-        return [product[0] for product in products.all()]
+        return [ProductInDBSchema(**product[0].__dict__) for product in products.all()]
 
     @staticmethod
     @create_session
@@ -55,7 +55,7 @@ class CRUDProduct:
     def update(product: ProductInDBSchema, session: Session = None) -> None:
         session.execute(
             update(Product).where(Product.id == product.id).values(
-                **product.__dict__
+                **product.dict()
             )
         )
         session.commit()

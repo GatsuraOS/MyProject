@@ -12,7 +12,7 @@ class CRUDStatus:
     @create_session
     def add(status: StatusSchema, session: Session = None) -> StatusInDBSchema | None:
         status = Status(
-            **status.__dict__
+            **status.dict()
         )
         session.add(status)
         try:
@@ -25,21 +25,21 @@ class CRUDStatus:
 
     @staticmethod
     @create_session
-    def get(status_id: int, session: Session = None) -> Status | None:
+    def get(status_id: int, session: Session = None) -> StatusInDBSchema | None:
         status = session.execute(
             select(Status).where(Status.id == status_id)
         )
         status = status.first()
         if status:
-            return status[0]
+            return StatusInDBSchema(**status[0].__dict__)
 
     @staticmethod
     @create_session
-    def get_all(session: Session) -> list[Status]:
+    def get_all(session: Session) -> list[StatusInDBSchema]:
         statuses = session.execute(
             select(Status)
         )
-        return [status[0] for status in statuses.all()]
+        return [StatusInDBSchema(**status[0].__dict__) for status in statuses.all()]
 
     @staticmethod
     @create_session
@@ -54,7 +54,7 @@ class CRUDStatus:
     def update(status: StatusInDBSchema, session: Session = None) -> None:
         session.execute(
             update(Status).where(Status.id == status.id). values(
-                **status.__dict__
+                **status.dict()
             )
         )
         session.commit()
