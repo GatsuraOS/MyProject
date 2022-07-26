@@ -2,8 +2,8 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from Models import Category, create_session
-from Schemas import CategorySchema, CategoryInDBSchema
+from Models import Category, create_session, Product
+from Schemas import CategorySchema, CategoryInDBSchema, ProductInDBSchema
 
 
 class CRUDCategory:
@@ -58,3 +58,27 @@ class CRUDCategory:
             )
         )
         session.commit()
+
+    @staticmethod
+    @create_session
+    def get_products(
+            category_id: int = None,
+            session: Session = None
+    ) -> list[tuple[CategoryInDBSchema, ProductInDBSchema]] | None:
+        if category_id:
+            response = session.execute(
+                select(Category, Product)
+                .join(Product, Category.id == Product.category_id)
+                .where(Category.id == category_id)
+            )
+        else:
+            response = session.execute(
+                select(Category, Product)
+                .join(Product, Category.id == Product.category_id)
+            )
+        return [
+            (
+                CategoryInDBSchema(**res[0].__dict__),
+                ProductInDBSchema(**res[1].__dict__)
+            ) for res in response
+        ]

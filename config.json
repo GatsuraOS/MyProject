@@ -1,0 +1,5 @@
+{
+  "DATABASE": {
+    "URI": "postgresql://belhard:belhard@localhost:5432/belhard"
+  }
+}
