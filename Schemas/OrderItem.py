@@ -6,7 +6,7 @@ from . import ProductInDBSchema
 class OrderItemSchema(BaseModel):
     order_id: list[OrderInDBSchema]
     product_id: list[ProductInDBSchema]
-    total: int = Field(default=0)
+    total: float = Field(default=0)
 
 
 class OrderItemInDBSchema(OrderItemSchema):
