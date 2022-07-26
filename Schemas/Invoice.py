@@ -1,15 +1,13 @@
 from datetime import datetime
 
 from pydantic import BaseModel, Field
-from . import BotUserInDBSchema
-from . import StatusInDBSchema
 
 
 class InvoiceSchema(BaseModel):
-    bot_user_id: list[BotUserInDBSchema]
+    bot_user_id: str = Field(max_length=20)
     date_create: datetime = Field(default=datetime.now())
-    total: float = Field(default=0)
-    status_id: list[StatusInDBSchema]
+    total: int = Field(default=0)
+    status_id: int = Field(ge=1)
 
 
 class InvoiceInDBSchema(InvoiceSchema):
