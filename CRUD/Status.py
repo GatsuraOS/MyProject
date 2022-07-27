@@ -1,16 +1,16 @@
 from sqlalchemy import delete, update, select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
 from Schemas import StatusSchema, StatusInDBSchema
-from Models import Status, create_session
+from Models import Status, create_async_session
 
 
 class CRUDStatus:
 
     @staticmethod
-    @create_session
-    def add(status: StatusSchema, session: Session = None) -> StatusInDBSchema | None:
+    @create_async_session
+    def add(status: StatusSchema, session: AsyncSession = None) -> StatusInDBSchema | None:
         status = Status(
             **status.dict()
         )
@@ -24,9 +24,9 @@ class CRUDStatus:
             return StatusInDBSchema(**status.__dict__)
 
     @staticmethod
-    @create_session
-    def get(status_id: int, session: Session = None) -> StatusInDBSchema | None:
-        status = session.execute(
+    @create_async_session
+    def get(status_id: int, session: AsyncSession = None) -> StatusInDBSchema | None:
+        status = await session.execute(
             select(Status).where(Status.id == status_id)
         )
         status = status.first()
@@ -34,27 +34,27 @@ class CRUDStatus:
             return StatusInDBSchema(**status[0].__dict__)
 
     @staticmethod
-    @create_session
-    def get_all(session: Session) -> list[StatusInDBSchema]:
-        statuses = session.execute(
+    @create_async_session
+    def get_all(session: AsyncSession = None) -> list[StatusInDBSchema]:
+        statuses = await session.execute(
             select(Status)
         )
         return [StatusInDBSchema(**status[0].__dict__) for status in statuses.all()]
 
     @staticmethod
-    @create_session
-    def delete(status_id: int, session: Session = None) -> None:
-        session.execute(
+    @create_async_session
+    def delete(status_id: int, session: AsyncSession = None) -> None:
+        await session.execute(
             delete(Status).where(Status.id == status_id)
         )
-        session.commit()
+        await session.commit()
 
     @staticmethod
-    @create_session
-    def update(status: StatusInDBSchema, session: Session = None) -> None:
-        session.execute(
+    @create_async_session
+    def update(status: StatusInDBSchema, session: AsyncSession = None) -> None:
+        await session.execute(
             update(Status).where(Status.id == status.id). values(
                 **status.dict()
             )
         )
-        session.commit()
+        await session.commit()

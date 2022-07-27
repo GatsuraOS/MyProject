@@ -1,32 +1,32 @@
 from sqlalchemy import select, update, delete
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from Models import Category, create_session, Product
+from Models import Category, create_async_session, Product
 from Schemas import CategorySchema, CategoryInDBSchema, ProductInDBSchema
 
 
 class CRUDCategory:
 
     @staticmethod
-    @create_session
-    def add(category: CategorySchema, session: Session = None) -> CategoryInDBSchema | None:
+    @create_async_session
+    async def add(category: CategorySchema, session: AsyncSession = None) -> CategoryInDBSchema | None:
         category = Category(
             **category.dict()
         )
         session.add(category)
         try:
-            session.commit()
+            await session.commit()
         except IntegrityError:
             return None
         else:
-            session.refresh(category)
+            await session.refresh(category)
             return CategoryInDBSchema(**category.__dict__)
 
     @staticmethod
-    @create_session
-    def get(category_id: int, session: Session = None) -> CategoryInDBSchema | None:
-        category = session.execute(
+    @create_async_session
+    async def get(category_id: int, session: AsyncSession = None) -> CategoryInDBSchema | None:
+        category = await session.execute(
             select(Category).where(Category.id == category_id)
         )
         category = category.first()
@@ -34,45 +34,45 @@ class CRUDCategory:
             return CategoryInDBSchema(**category[0].__dict__)
 
     @staticmethod
-    @create_session
-    def get_all(session: Session = None) -> list[CategoryInDBSchema]:
-        categories = session.execute(
+    @create_async_session
+    async def get_all(session: AsyncSession = None) -> list[CategoryInDBSchema]:
+        categories = await session.execute(
             select(Category)
         )
         return [CategoryInDBSchema(**category[0].__dict__) for category in categories.all()]
 
     @staticmethod
-    @create_session
-    def delete(category_id: int, session: Session = None) -> None:
-        session.execute(
+    @create_async_session
+    async def delete(category_id: int, session: AsyncSession = None) -> None:
+        await session.execute(
             delete(Category).where(Category.id == category_id)
         )
-        session.commit()
+        await session.commit()
 
     @staticmethod
-    @create_session
-    def update(category: CategoryInDBSchema, session: Session = None) -> None:
-        session.execute(
+    @create_async_session
+    async def update(category: CategoryInDBSchema, session: AsyncSession = None) -> None:
+        await session.execute(
             update(Category).where(Category.id == category.id).values(
                 **category.dict()
             )
         )
-        session.commit()
+        await session.commit()
 
     @staticmethod
-    @create_session
-    def get_products(
+    @create_async_session
+    async def get_products(
             category_id: int = None,
-            session: Session = None
+            session: AsyncSession = None
     ) -> list[tuple[CategoryInDBSchema, ProductInDBSchema]] | None:
         if category_id:
-            response = session.execute(
+            response = await session.execute(
                 select(Category, Product)
                 .join(Product, Category.id == Product.category_id)
                 .where(Category.id == category_id)
             )
         else:
-            response = session.execute(
+            response = await session.execute(
                 select(Category, Product)
                 .join(Product, Category.id == Product.category_id)
             )

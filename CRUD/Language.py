@@ -1,32 +1,32 @@
 from sqlalchemy import update, delete, select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
 from Schemas import LanguageSchema, LanguageInDBSchema
-from Models import Language, create_session
+from Models import Language, create_async_session
 
 
 class CRUDLanguage:
 
     @staticmethod
-    @create_session
-    def add(language: LanguageSchema, session: Session = None) -> LanguageInDBSchema | None:
+    @create_async_session
+    async def add(language: LanguageSchema, session: AsyncSession = None) -> LanguageInDBSchema | None:
         language = Language(
             **language.dict()
         )
         session.add(language)
         try:
-            session.commit()
+            await session.commit()
         except IntegrityError:
             return None
         else:
-            session.refresh(language)
+            await session.refresh(language)
             return LanguageInDBSchema(**language.__dict__)
 
     @staticmethod
-    @create_session
-    def get(language_id: int, session: Session = None) -> LanguageInDBSchema | None:
-        language = session.execute(
+    @create_async_session
+    async def get(language_id: int, session: AsyncSession = None) -> LanguageInDBSchema | None:
+        language = await session.execute(
             select(Language).where(Language.id == language_id)
         )
         language = language.first()
@@ -34,27 +34,27 @@ class CRUDLanguage:
             return LanguageInDBSchema(**language[0].__dict__)
 
     @staticmethod
-    @create_session
-    def get_all(session: Session = None) -> list[LanguageInDBSchema]:
-        languages = session.execute(
+    @create_async_session
+    async def get_all(session: AsyncSession = None) -> list[LanguageInDBSchema]:
+        languages = await session.execute(
             select(Language)
         )
         return [LanguageInDBSchema(**language[0].__dict__) for language in languages.all()]
 
     @staticmethod
-    @create_session
-    def delete(language_id: int, session: Session = None) -> None:
-        session.execute(
+    @create_async_session
+    async def delete(language_id: int, session: AsyncSession = None) -> None:
+        await session.execute(
             delete(Language).where(Language.id == language_id)
         )
-        session.commit()
+        await session.commit()
 
     @staticmethod
-    @create_session
-    def update(language: LanguageInDBSchema, session: Session = None) -> None:
-        session.execute(
+    @create_async_session
+    async def update(language: LanguageInDBSchema, session: AsyncSession = None) -> None:
+        await session.execute(
             update(Language).where(Language.id == language.id).values(
                 **language.dict()
             )
         )
-        session.commit()
+        await session.commit()
