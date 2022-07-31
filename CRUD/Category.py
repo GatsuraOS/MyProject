@@ -35,10 +35,17 @@ class CRUDCategory:
 
     @staticmethod
     @create_async_session
-    async def get_all(session: AsyncSession = None) -> list[CategoryInDBSchema]:
-        categories = await session.execute(
-            select(Category)
-        )
+    async def get_all(parent_id: int = None, session: AsyncSession = None) -> list[CategoryInDBSchema]:
+        if parent_id:
+            categories = await session.execute(
+                select(Category)
+                .order_by(Category.id)
+                .where(Category.parent_id == parent_id)
+            )
+        else:
+            categories = await session.execute(
+                select(Category)
+            )
         return [CategoryInDBSchema(**category[0].__dict__) for category in categories.all()]
 
     @staticmethod

@@ -19,8 +19,8 @@ async def get_category(category_id: int):
 
 
 @category_router.get("/all", response_model=list[CategoryInDBSchema])
-async def get_all_categories():
-    categories = await CRUDCategory.get_all()
+async def get_all_categories(parent_id: int = None):
+    categories = await CRUDCategory.get_all(parent_id=parent_id)
     if categories:
         return categories
     else:
@@ -28,7 +28,7 @@ async def get_all_categories():
 
 
 @category_router.post("/add", response_model=CategoryInDBSchema)
-async def add_category(category: CategorySchema | None):
+async def add_category(category: CategorySchema):
     category = await CRUDCategory.add(category=category)
     if category:
         return category
