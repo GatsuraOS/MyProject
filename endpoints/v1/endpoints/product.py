@@ -27,7 +27,7 @@ async def get_all_products():
         HTTPException(status_code=404, detail="products not found")
 
 
-@product_router.post("/add", tags=["Product"])
+@product_router.post("/add", response_model=ProductInDBSchema, tags=["Product"])
 async def add_product(product: ProductSchema):
     product = await CRUDProduct.add(product=product)
     if product:
@@ -35,3 +35,14 @@ async def add_product(product: ProductSchema):
     else:
         raise HTTPException(status_code=404, detail="this product is exist")
 
+
+@product_router.delete("/del", tags=["Product"])
+async def delete_product(product_id: int):
+    await CRUDProduct.delete(product_id=product_id)
+    raise HTTPException(status_code=200, detail=f"product with id {product_id} was deleted")
+
+
+@product_router.put("/update", tags=["Product"])
+async def update_product(product: ProductInDBSchema):
+    await CRUDProduct.update(product=product)
+    raise HTTPException(status_code=200, detail="product was updated")
