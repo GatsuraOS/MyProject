@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from Schemas import CategorySchema, CategoryInDBSchema
+from Schemas import CategorySchema, CategoryInDBSchema, ProductInDBSchema
 from CRUD import CRUDCategory
 
 
@@ -46,3 +46,12 @@ async def delete_category(category_id: int):
 async def update_category(category: CategoryInDBSchema):
     await CRUDCategory.update(category=category)
     raise HTTPException(status_code=200, detail="category was updated")
+
+
+@category_router.get("/get_products", response_model=list[tuple[CategoryInDBSchema, ProductInDBSchema]])
+async def get_products_from_category(category_id: int = None):
+    products = await CRUDCategory.get_products(category_id=category_id)
+    if products:
+        return products
+    else:
+        raise HTTPException(status_code=404, detail="category not found")
