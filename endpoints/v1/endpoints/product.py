@@ -9,7 +9,7 @@ product_router = APIRouter(
 )
 
 
-@product_router.get("/get", response_model=ProductInDBSchema)
+@product_router.get("/get", response_model=ProductInDBSchema, tags=["Product"])
 async def get_product(product_id: int):
     product = await CRUDProduct.get(product_id=product_id)
     if product:
