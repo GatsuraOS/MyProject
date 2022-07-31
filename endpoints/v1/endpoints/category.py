@@ -34,3 +34,15 @@ async def add_category(category: CategorySchema | None):
         return category
     else:
         raise HTTPException(status_code=404, detail="category is exist")
+
+
+@category_router.delete("/del")
+async def delete_category(category_id: int):
+    await CRUDCategory.delete(category_id=category_id)
+    raise HTTPException(status_code=200, detail="category was deleted")
+
+
+@category_router.put("/update")
+async def update_category(category: CategoryInDBSchema):
+    await CRUDCategory.update(category=category)
+    raise HTTPException(status_code=200, detail="category was updated")
