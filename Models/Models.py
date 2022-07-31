@@ -11,9 +11,9 @@ class Category(Base):
     __tablename__: str = "categories"
 
     id = Column(SmallInteger, primary_key=True)
-    parent_id = Column(SmallInteger, ForeignKey("categories.id", ondelete="CASCADE"))
+    parent_id = Column(SmallInteger, ForeignKey("categories.id", ondelete="CASCADE"), default=None)
     is_published = Column(Boolean, default=False)
-    name = Column(VARCHAR(20), nullable=False)
+    name = Column(VARCHAR(20), nullable=False, unique=True)
 
 
 class Product(Base):

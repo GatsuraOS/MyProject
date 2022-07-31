@@ -28,7 +28,7 @@ async def get_all_categories():
 
 
 @category_router.post("/add", response_model=CategoryInDBSchema)
-async def add_category(category: CategorySchema):
+async def add_category(category: CategorySchema | None):
     category = await CRUDCategory.add(category=category)
     if category:
         return category
