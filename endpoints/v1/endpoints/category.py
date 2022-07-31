@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from  Schemas import  CategorySchema, CategoryInDBSchema
+from Schemas import CategorySchema, CategoryInDBSchema
 from CRUD import CRUDCategory
 
 
@@ -16,3 +16,21 @@ async def get_category(category_id: int):
         return category
     else:
         raise HTTPException(status_code=404, detail="category not found")
+
+
+@category_router.get("/all", response_model=list[CategoryInDBSchema])
+async def get_all_categories():
+    categories = await CRUDCategory.get_all()
+    if categories:
+        return categories
+    else:
+        raise HTTPException(status_code=404, detail="categories not found")
+
+
+@category_router.post("/add", response_model=CategoryInDBSchema)
+async def add_category(category: CategorySchema):
+    category = await CRUDCategory.add(category=category)
+    if category:
+        return category
+    else:
+        raise HTTPException(status_code=404, detail="category is exist")
