@@ -31,7 +31,7 @@ class Language(Base):
     __tablename__: str = "languages"
 
     id = Column(SmallInteger, primary_key=True)
-    language_cod = Column(CHAR(2), nullable=False, unique=True)
+    language_code = Column(CHAR(2), nullable=False, unique=True)
 
 
 class Status(Base):
