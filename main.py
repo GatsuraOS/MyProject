@@ -11,6 +11,10 @@ tags = [
     {
         "name": "Product",
         "description": "endpoints for product"
+    },
+    {
+        "name": "Language",
+        "description": "endpoints for language"
     }
 ]
 

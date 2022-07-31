@@ -18,7 +18,7 @@ async def get_product(product_id: int):
         raise HTTPException(status_code=404, detail=f"product with id {product_id} not found")
 
 
-@product_router.get("/all", response_model=ProductInDBSchema, tags=["Product"])
+@product_router.get("/all", response_model=list[ProductInDBSchema], tags=["Product"])
 async def get_all_products():
     products = await CRUDProduct.get_all()
     if products:
