@@ -10,22 +10,22 @@ class CRUDOrderItem:
 
     @staticmethod
     @create_async_session
-    def add(order_item: OrderItemSchema, session: AsyncSession = None) -> OrderItemInDBSchema | None:
+    async def add(order_item: OrderItemSchema, session: AsyncSession = None) -> OrderItemInDBSchema | None:
         order_item = OrderItem(
             **order_item.dict()
         )
         session.add(order_item)
         try:
-            session.commit()
+            await session.commit()
         except IntegrityError:
             return None
         else:
-            session.refresh(order_item)
+            await session.refresh(order_item)
             return OrderItemInDBSchema(**order_item.__dict__)
 
     @staticmethod
     @create_async_session
-    def get(order_item_id: int, session: AsyncSession = None) -> OrderItemInDBSchema | None:
+    async def get(order_item_id: int, session: AsyncSession = None) -> OrderItemInDBSchema | None:
         order_item = await session.execute(
             select(OrderItem).where(OrderItem.id == order_item_id)
         )
@@ -35,7 +35,7 @@ class CRUDOrderItem:
 
     @staticmethod
     @create_async_session
-    def get_all(session: AsyncSession = None) -> list[OrderItemInDBSchema]:
+    async def get_all(session: AsyncSession = None) -> list[OrderItemInDBSchema]:
         order_items = await session.execute(
             select(OrderItem)
         )
@@ -43,18 +43,18 @@ class CRUDOrderItem:
 
     @staticmethod
     @create_async_session
-    def delete(order_item_id: int, session: AsyncSession = None) -> None:
-        session.execute(
+    async def delete(order_item_id: int, session: AsyncSession = None) -> None:
+        await session.execute(
             delete(OrderItem).where(OrderItem.id == order_item_id)
         )
-        session.commit()
+        await session.commit()
 
     @staticmethod
     @create_async_session
-    def update(order_item: OrderItemInDBSchema, session: AsyncSession = None) -> None:
-        session.execute(
+    async def update(order_item: OrderItemInDBSchema, session: AsyncSession = None) -> None:
+        await session.execute(
             update(OrderItem).where(OrderItem.id == order_item.id).values(
                 **order_item.dict()
             )
         )
-        session.commit()
+        await session.commit()

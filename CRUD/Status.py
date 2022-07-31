@@ -10,22 +10,22 @@ class CRUDStatus:
 
     @staticmethod
     @create_async_session
-    def add(status: StatusSchema, session: AsyncSession = None) -> StatusInDBSchema | None:
+    async def add(status: StatusSchema, session: AsyncSession = None) -> StatusInDBSchema | None:
         status = Status(
             **status.dict()
         )
         session.add(status)
         try:
-            session.commit()
+            await session.commit()
         except IntegrityError:
             return None
         else:
-            session.refresh(status)
+            await session.refresh(status)
             return StatusInDBSchema(**status.__dict__)
 
     @staticmethod
     @create_async_session
-    def get(status_id: int, session: AsyncSession = None) -> StatusInDBSchema | None:
+    async def get(status_id: int, session: AsyncSession = None) -> StatusInDBSchema | None:
         status = await session.execute(
             select(Status).where(Status.id == status_id)
         )
@@ -35,7 +35,7 @@ class CRUDStatus:
 
     @staticmethod
     @create_async_session
-    def get_all(session: AsyncSession = None) -> list[StatusInDBSchema]:
+    async def get_all(session: AsyncSession = None) -> list[StatusInDBSchema]:
         statuses = await session.execute(
             select(Status)
         )
@@ -43,7 +43,7 @@ class CRUDStatus:
 
     @staticmethod
     @create_async_session
-    def delete(status_id: int, session: AsyncSession = None) -> None:
+    async def delete(status_id: int, session: AsyncSession = None) -> None:
         await session.execute(
             delete(Status).where(Status.id == status_id)
         )
@@ -51,7 +51,7 @@ class CRUDStatus:
 
     @staticmethod
     @create_async_session
-    def update(status: StatusInDBSchema, session: AsyncSession = None) -> None:
+    async def update(status: StatusInDBSchema, session: AsyncSession = None) -> None:
         await session.execute(
             update(Status).where(Status.id == status.id). values(
                 **status.dict()
