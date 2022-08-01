@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
 from Schemas import LanguageSchema, LanguageInDBSchema
 from CRUD import CRUDLanguage
@@ -9,8 +9,16 @@ language_router = APIRouter(
 )
 
 
+async def check_language_id(language_id: int) -> int | None:
+    language = await CRUDLanguage.get(language_id=language_id)
+    if language:
+        return language_id
+    else:
+        raise HTTPException(status_code=404, detail="invalid language_id arrived")
+
+
 @language_router.get("/get", response_model=LanguageInDBSchema, tags=["Language"])
-async def get_language(language_id: int):
+async def get_language(language_id: int = Depends(check_language_id)):
     language = await CRUDLanguage.get(language_id=language_id)
     if language:
         return language
@@ -37,7 +45,7 @@ async def add_language(language: LanguageSchema):
 
 
 @language_router.delete("/del", tags=["Language"])
-async def delete_language(language_id: int):
+async def delete_language(language_id: int = Depends(check_language_id)):
     await CRUDLanguage.delete(language_id=language_id)
     raise HTTPException(status_code=200, detail=f"language with id {language_id} was deleted")
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
 from Schemas import CategorySchema, CategoryInDBSchema, ProductInDBSchema
 from CRUD import CRUDCategory
@@ -9,8 +9,16 @@ category_router = APIRouter(
 )
 
 
+async def check_category_id(category_id: int) -> int | None:
+    category = await CRUDCategory.get(category_id=category_id)
+    if category:
+        return category_id
+    else:
+        raise HTTPException(status_code=404, detail="invalid category_id arrived")
+
+
 @category_router.get("/get", response_model=CategoryInDBSchema, tags=["Category"])
-async def get_category(category_id: int):
+async def get_category(category_id: int = Depends(check_category_id)):
     category = await CRUDCategory.get(category_id=category_id)
     if category:
         return category
@@ -37,7 +45,7 @@ async def add_category(category: CategorySchema):
 
 
 @category_router.delete("/del", tags=["Category"])
-async def delete_category(category_id: int):
+async def delete_category(category_id: int = Depends(check_category_id)):
     await CRUDCategory.delete(category_id=category_id)
     raise HTTPException(status_code=200, detail="category was deleted")
 

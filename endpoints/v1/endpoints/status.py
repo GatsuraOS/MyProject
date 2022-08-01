@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
 from Schemas import StatusSchema, StatusInDBSchema
 from CRUD import CRUDStatus
@@ -9,8 +9,16 @@ status_router = APIRouter(
 )
 
 
+async def check_status_id(status_id: int) -> int | None:
+    status = await CRUDStatus.get(status_id=status_id)
+    if status:
+        return status_id
+    else:
+        raise HTTPException(status_code=404, detail="invalid status_id arrived")
+
+
 @status_router.get("/get", response_model=StatusInDBSchema, tags=["Status"])
-async def get_status(status_id: int):
+async def get_status(status_id: int = Depends(check_status_id)):
     status = await CRUDStatus.get(status_id=status_id)
     if status:
         return status
@@ -37,7 +45,7 @@ async def add_status(status: StatusSchema):
 
 
 @status_router.delete("/del", tags=["Status"])
-async def delete_status(status_id: int):
+async def delete_status(status_id: int = Depends(check_status_id)):
     await CRUDStatus.delete(status_id=status_id)
     raise HTTPException(status_code=200, detail=f"status with id {status_id} was deleted")
 

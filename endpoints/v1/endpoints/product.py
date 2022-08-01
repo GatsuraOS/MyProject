@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
 from Schemas import ProductSchema, ProductInDBSchema
 from CRUD import CRUDProduct
@@ -9,8 +9,16 @@ product_router = APIRouter(
 )
 
 
+async def check_product_id(product_id: int) -> int | None:
+    product = await CRUDProduct.get(product_id=product_id)
+    if product:
+        return product_id
+    else:
+        raise HTTPException(status_code=404, detail="invalid product_id arrived")
+
+
 @product_router.get("/get", response_model=ProductInDBSchema, tags=["Product"])
-async def get_product(product_id: int):
+async def get_product(product_id: int = Depends(check_product_id)):
     product = await CRUDProduct.get(product_id=product_id)
     if product:
         return product
@@ -37,7 +45,7 @@ async def add_product(product: ProductSchema):
 
 
 @product_router.delete("/del", tags=["Product"])
-async def delete_product(product_id: int):
+async def delete_product(product_id: int = Depends(check_product_id)):
     await CRUDProduct.delete(product_id=product_id)
     raise HTTPException(status_code=200, detail=f"product with id {product_id} was deleted")
 

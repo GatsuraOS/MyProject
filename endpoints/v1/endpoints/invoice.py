@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
-from Schemas import InvoiceSchema, InvoiceInDBSchema
+from Schemas import InvoiceInDBSchema
 from CRUD import CRUDInvoice
 
 
@@ -9,8 +9,16 @@ invoice_router = APIRouter(
 )
 
 
+async def check_invoice_id(invoice_id: str) -> str | None:
+    invoice = await CRUDInvoice.get(invoice_id=invoice_id)
+    if invoice:
+        return invoice_id
+    else:
+        raise HTTPException(status_code=404, detail="invalid invoice_id arrived")
+
+
 @invoice_router.get("/get", response_model=InvoiceInDBSchema, tags=["Invoice"])
-async def get_invoice(invoice_id: str):
+async def get_invoice(invoice_id: str = Depends(check_invoice_id)):
     invoice = await CRUDInvoice.get(invoice_id=invoice_id)
     if invoice:
         return invoice
@@ -37,7 +45,7 @@ async def add_invoice(invoice: InvoiceInDBSchema):
 
 
 @invoice_router.delete("/del", tags=["Invoice"])
-async def delete_invoice(invoice_id: str):
+async def delete_invoice(invoice_id: str = Depends(check_invoice_id)):
     await CRUDInvoice.delete(invoice_id=invoice_id)
     raise HTTPException(status_code=200, detail=f"invoice with id {invoice_id} was deleted")
 

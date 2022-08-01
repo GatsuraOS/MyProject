@@ -23,6 +23,10 @@ tags = [
     {
         "name": "Invoice",
         "description": "endpoints for invoice"
+    },
+    {
+        "name": "BotUser",
+        "description": "endpoints for bot_user"
     }
 ]
 
