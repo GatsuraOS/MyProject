@@ -19,6 +19,10 @@ tags = [
     {
         "name": "Status",
         "description": "endpoints for status"
+    },
+    {
+        "name": "Invoice",
+        "description": "endpoints for invoice"
     }
 ]
 
