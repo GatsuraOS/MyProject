@@ -31,6 +31,10 @@ tags = [
     {
         "name": "Order",
         "description": "endpoints for order"
+    },
+    {
+        "name": "OrderItem",
+        "description": "endpoints for order_item"
     }
 ]
 
