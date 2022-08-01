@@ -27,6 +27,10 @@ tags = [
     {
         "name": "BotUser",
         "description": "endpoints for bot_user"
+    },
+    {
+        "name": "Order",
+        "description": "endpoints for order"
     }
 ]
 
